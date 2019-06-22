@@ -6,6 +6,95 @@
 body   {margin: 5em;}
 .row    {padding-top: 5em;}
 .img   {padding-top: 5em;}
+/* Buttons */
+
+.btn {
+	letter-spacing: 1px;
+	text-decoration: none;
+	background: none;
+    -moz-user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 0;
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;
+    white-space: nowrap;
+	font-size:14px;
+	line-height:20px;
+	font-weight:700;
+	text-transform:uppercase;
+	border: 3px solid;
+	padding:8px 20px;
+}
+
+.btn-outlined {
+    border-radius: 0;
+    -webkit-transition: all 0.3s;
+       -moz-transition: all 0.3s;
+            transition: all 0.3s;
+}
+
+.btn-outlined.btn-theme {
+    background: none;
+    color: #6f5499;
+	border-color: #6f5499;
+}
+
+.btn-outlined.btn-theme:hover,
+.btn-outlined.btn-theme:active {
+    color: #FFF;
+    background: #6f5499;
+    border-color: #6f5499;
+}
+
+.btn-outlined.btn-black {
+    background: none;
+    color: #000000;
+	border-color: #000000;
+}
+
+.btn-outlined.btn-black:hover,
+.btn-outlined.btn-black:active {
+    color: #FFF;
+    background: #000000;
+    border-color: #000000;
+}
+
+.btn-outlined.btn-white {
+    background: none;
+    color: #FFFFFF;
+	border-color: #FFFFFF;
+}
+
+.btn-outlined.btn-white:hover,
+.btn-outlined.btn-white:active {
+    color: #6f5499;
+    background: #FFFFFF;
+    border-color: #FFFFFF;
+}
+
+.btn-xs{
+	font-size:11px;
+	line-height:14px;
+	border: 1px solid;
+	padding:5px 10px;
+}
+
+.btn-sm{
+	font-size:12px;
+	line-height:16px;
+	border: 2px solid;
+	padding:8px 15px;
+}
+
+.btn-lg{
+	font-size:3em;
+	line-height:22px;
+	border: 4px solid;
+	padding:13px 40px;
+}
 </style>
 </head>
 <body>
@@ -67,21 +156,24 @@ body   {margin: 5em;}
 
 
 <div class="row align-items-center">
+  <div class="col-xl-12"><h2>Installation | Lawrence II | 2009</h2>
+    <img src="https://66.media.tumblr.com/af1fa01c831f79beab6509e61d60ee40/tumblr_mz168hdQ2o1qay4feo1_1280.png"   class="img-fluid"></div>
 
   <div class="col-xl-12"><h2>Colour Photography | Matalas</h2>
     <img src="https://66.media.tumblr.com/2d883408071a8e54de32d34a389fa5ff/tumblr_pmrjdcEGnh1qay4feo1_1280.jpg"   class="img-fluid"></div>
   <div class="col-xl-12"><h2>Sculpture  | Alien Head</h2><img src="https://66.media.tumblr.com/2431a8a90f490f9df2004e3ce0620906/tumblr_o3w472VdeR1qay4feo1_1280.jpg" class="img-fluid"></div>
 
-  <div class="col-xl-12"><img src="glass.png" class="img-fluid"></div>
-  <div class="col-xl-12"><img src="glass.png" class="img-fluid"></div>
+
 </div>
 
 <div class="row align-items-center">
   <div class="col"><img src="glass.png" class="img-fluid"></div>
-  <div class="col text-center"><button href="https://paypal.me/marselluswallace?locale.x=en_US">DONATE TO ME</button></div>
-  <div class="col"><img src="glass.png" class="img-fluid"></div>
+  <div class="col text-center"><button class="btn-lg" href="https://paypal.me/marselluswallace?locale.x=en_US">DONATE PLZ</button></div>
+  <div class="col"><p>All proceeds will go to buying new software, hardware and materials for my upcoming projects.</p></div>
 </div>
+
 <div class="row align-items-center">
+  <div class="col-xl-12"><h2>Video: Stop Motion Playa</h2></div>
   <div class="embed-responsive embed-responsive-16by9">
 <iframe src="https://player.vimeo.com/video/79595033?autoplay=1&loop=1&title=0&byline=0&portrait=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
 
