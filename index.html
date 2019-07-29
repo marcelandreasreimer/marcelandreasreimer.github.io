@@ -24,7 +24,7 @@
   <style>
     body  {margin: 5em;}
     .row  {padding-top: 5em;}
-    h1    {font-size:15em; line-height:80%;
+    h1    {font-size:15em; line-height:70%;
       background: -webkit-linear-gradient(aqua, chartreuse);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
@@ -235,8 +235,13 @@
       </div>
       <button onclick="myFunction ()" style="margin-top:1%; padding:0.5em; min-width:100%" type="button" class="btn-outlined btn-black btn btn-lg questo">DONATE</button>
       <div id="myDIV" class="buttonDIV">
-        <h3>Want to donate to my cause? All proceeds will go to buying new software, hardware and materials for my upcoming projects. <a href="https://paypal.me/marselluswallace?locale.x=en_US">Please donate here</a>
+        <h3>Want to donate to my cause? All proceeds will go to buying new software, hardware and materials for my upcoming projects. <a href="https://paypal.me/marselluswallace?locale.x=en_US">Click here to donate!</a>
         </h3>
+      </div>
+
+      <button onclick="myFunction4 ()" style="margin-top:1%; padding:0.5em; min-width:100%" type="button" class="btn-outlined btn-black btn btn-lg questo">CONTACT</button>
+      <div id="myDIV4" class="buttonDIV">
+                <h3 style="font-size:2em">Shoot a message to <a href="mailto:marcelandreas.gmail.com">marcelandreas.reimer@gmail.com</a><br></h3>
       </div>
 
 
@@ -280,6 +285,16 @@
           }
         }
       </script>
+      <script>
+        function myFunction4() {
+          var x = document.getElementById("myDIV4");
+          if (x.style.display === "none") {
+            x.style.display = "block";
+          } else {
+            x.style.display = "none";
+          }
+        }
+      </script>
     </div>
   </div>
 
@@ -297,7 +312,7 @@
   <footer>
     <div class="row align-items-center">
       <div class="col-xl-8">
-        <p style="font-size:2em"><a href="mailto:marcelandreas.gmail.com">marcelandreas.reimer@gmail.com</a></p>
+
         <p>All images © 2019 Marcel Andreas Reimer <br>Coded with love in Zürich Switzerland</p>
       </div>
 
