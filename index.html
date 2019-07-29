@@ -24,7 +24,7 @@
   <style>
     body  {margin: 5em;}
     .row  {padding-top: 5em;}
-    h1    {font-size:15em; line-height:50%;
+    h1    {font-size:15em; line-height:73%;
       background: -webkit-linear-gradient(aqua, chartreuse);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
@@ -32,6 +32,9 @@
       background: -webkit-linear-gradient(crimson, pink);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
     h3    {font-size:2em; padding-top: 1em;}
+
+.buttonDIV  {display:none; text-align: left; padding:3em; margin-bottom:1em; background-image: linear-gradient(‘#’ + Math.random().toString(16).slice(2, 8).toUpperCase();, #3f1ff0);}
+
 
 
     .questo:hover {
@@ -219,19 +222,19 @@
     <div class="col text-center">
 
       <button onclick="myFunction1()" style="margin-top:1%; padding:0.5em; min-width:100%" class="btn-outlined btn-black btn btn-lg questo">WEB DEVELOPMENT</button>
-      <div id="myDIV1" style="display:none; text-align: left; padding:3em; margin-bottom:1em">
+      <div id="myDIV1" class="buttonDIV">
         <h3>Do you need a simple website just like this one? <br>You can hire me as your web developer.</h3>
       </div>
       <button onclick="myFunction2()" style="margin-top:1%; padding:0.5em; min-width:100%" class="btn-outlined btn-black btn btn-lg questo">LIVE VISUALS (VJ)</button>
-      <div id="myDIV2" style="display:none; text-align: left; padding:3em; margin-bottom:1em">
+      <div id="myDIV2" class="buttonDIV">
         <h3>Book me as your VJ for your next event. All visuals are created with <a href="https://robotized.arisona.ch/scheinwerfer/">soundium software</a>. I am part of the scheinwerfer collective.</h3>
       </div>
       <button onclick="myFunction3()" style="margin-top:1%; padding:0.5em; min-width:100%" class="btn-outlined btn-black btn btn-lg questo">GRAPHIC DESIGN</button>
-      <div id="myDIV3" style="display:none; text-align: left; padding:3em; margin-bottom:1em">
+      <div id="myDIV3" class="buttonDIV">
         <h3>Need a logo or web banner for your business or social media? <br>Hire me for your next design!</h3>
       </div>
       <button onclick="myFunction ()" style="margin-top:1%; padding:0.5em; min-width:100%" type="button" class="btn-outlined btn-black btn btn-lg questo">DONATE</button>
-      <div id="myDIV" style="display:none; text-align: left; padding:3em; margin-bottom:1em">
+      <div id="myDIV" class="buttonDIV">
         <h3>Want to donate to my cause? All proceeds will go to buying new software, hardware and materials for my upcoming projects. <a href="https://paypal.me/marselluswallace?locale.x=en_US">Please donate here</a>
         </h3>
       </div>
