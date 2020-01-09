@@ -1,0 +1,29 @@
+/*!
+ * Start Bootstrap - Full Width Pics (https://startbootstrap.com/template-overviews/full-width-pics)
+ * Copyright 2013-2019 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-full-width-pics/blob/master/LICENSE)
+ */
+
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap');
+
+body {
+font-family: 'Roboto Mono', monospace;
+}
+
+.TEXT {
+/*font-size:20px;
+margin-top  :45px;*/
+}
+
+.bg-image-full {
+  background: no-repeat bottom bottom scroll;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
+
+.animate:hover {
+    -webkit-animation: pulse 1s;
+    animation: pulse 1s;
+}
