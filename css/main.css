@@ -28,6 +28,6 @@ margin-top  :45px;*/
     animation: pulse 1s;
 }
 
-.navbar.navbar .navbar-toggler-icon {
-background-image: url('https://mdbootstrap.com/img/svg/hamburger5.svg?color=f3e5f5');
+.icon-bar {
+   background-color:#FF0000 !important;
 }
