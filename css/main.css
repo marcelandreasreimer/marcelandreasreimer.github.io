@@ -4,10 +4,13 @@
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-full-width-pics/blob/master/LICENSE)
  */
 
-@import url('https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono|Press+Start+2P&display=swap');
+
+
 
 body {
-font-family: 'Roboto Mono', monospace;
+
+;
 }
 
 .TEXT {
@@ -32,6 +35,8 @@ margin-top  :45px;*/
 /* change the background color */
 .navbar-custom {
     background-color: #ff5500;
+    font-family: 'Press Start 2P', cursive;
+
 }
 /* change the brand and text color */
 .navbar-custom .navbar-brand,
