@@ -62,7 +62,7 @@ margin-top  :45px;*/
 .navbar-custom .navbar-brand,
 .navbar-custom .navbar-text {
     color: rgba(255,255,255,.8);
-    font-size: 50%;
+    font-size: 100%;
 }
 
 /* change the link color */
@@ -74,7 +74,7 @@ margin-top  :45px;*/
 .navbar-custom .nav-item.active .nav-link,
 .navbar-custom .nav-item:hover .nav-link {
     color: #ffffff;
-        font-size: 50%;
+        font-size: 100%;
 }
 
 /* for dropdown only - change the color of droodown */
