@@ -13,6 +13,12 @@ body {
 font-family:'Roboto Mono', monospace;
 }
 
+.navbar-custom {
+
+
+}
+
+
 .TEXT {
 /*font-size:20px;
 margin-top  :45px;*/
@@ -62,13 +68,13 @@ margin-top  :45px;*/
 .navbar-custom .navbar-brand,
 .navbar-custom .navbar-text {
     color: rgba(255,255,255,.8);
-    font-size: 1em;
+    font-size: 0.7em;
 }
 
 /* change the link color */
 
 .navbar-custom .navbar-nav .nav-link {
-    font-size: 1em;
+    font-size: 0.7em;
 }
 
 
