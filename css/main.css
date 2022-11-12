@@ -6,19 +6,12 @@
 
 @import url('https://fonts.googleapis.com/css?family=Roboto+Mono|Press+Start+2P&display=swap');
 
-
-
 body {
   font-family:'Roboto Mono', monospace;
 }
 
-footer{
-
-  }
-
 .TEXT {
-/*font-size:20px;
-margin-top  :45px;*/
+  padding: 0; margin:0;
 }
 
 .bg-image-full {
@@ -34,12 +27,14 @@ margin-top  :45px;*/
     animation: pulse 1s;
 }
 
+.navbar-toggler-icon{
+
+}
 
 /* change the background color */
 .navbar-custom {
     background-color: #ff5500;
     font-family: 'Press Start 2P', cursive;
-
 }
 /* change the brand and text color */
 .navbar-custom .navbar-brand,
