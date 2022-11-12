@@ -10,8 +10,8 @@ body {
   font-family:'Roboto Mono', monospace;
 }
 
-.TEXT {
-  padding: 0; margin:0; 
+p {
+  padding: 0; margin:0;
 }
 
 .bg-image-full {
