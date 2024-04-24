@@ -7,34 +7,55 @@ img {
     width: 100%;
   }
   
-  .masonry {
-      column-count: 3;
+  .masonryCol2 {
+      column-count: 2;
       column-gap: 16px;
   }
+
+  .masonryCol2 .mItem {
+    display: inline-block;
+    margin-bottom: 16px;
+    width: 100%;
+  }
+
+  .masonryCol3 {
+    column-count: 3;
+    column-gap: 16px;
+}
   
-  .masonry .mItem {
+ .masonryCol3 .mItem {
     display: inline-block;
     margin-bottom: 16px;
     width: 100%;
   }
   
   @media (max-width: 1199px) {
-    .masonry {
+    .masonryCol2 {
       column-count: 2;
+    }
+    .masonryCol3 {
+      column-count: 3;
     }
   }
   
   @media (max-width: 991px) {
-    .masonry {
+    .masonryCol2 {
+      column-count: 1;
+    }
+    .masonryCol3 {
       column-count: 1;
     }
   }
   
   @media (max-width: 767px) {
-    .masonry {
+    .masonryCol2 {
+      column-count: 1;
+    }
+    .masonryCol3 {
       column-count: 1;
     }
   }
-  
+
+
 
 
