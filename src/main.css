@@ -128,7 +128,7 @@ select {
   /* Modular scale: https://www.modularscale.com/?18&px&1.2 */
   --font-size-3xl: calc(3.79rem + 0.2vw);
   /* 45px */
-  --font-size-2xl: calc(1.94rem + 0.2vw);
+  --font-size-2xl: calc(2.33rem + 0.2vw);
   /* 31px */
   --font-size-xl: calc(1.62rem + 0.2vw);
   /* 26px */
@@ -137,9 +137,9 @@ select {
   --font-size: calc(1.125rem + 0.2vw);
   --font-size-s: calc(0.9rem + 0.2vw);
   --font-size-xs: calc(0.8rem + 0.2vw);
-  --width: 80rem;
+  --width: 100rem;
   --max-width: min(var(--width), calc(100vw - var(--space-4xl)));
-  --max-width-content: min(80rem, calc(100vw - var(--space-4xl)));
+  --max-width-content: min(100rem, calc(100vw - var(--space-4xl)));
   --max-width-media: calc(100% - 10vw);
   --space-5xl: 5em;
   --space-4xl: 3em;
