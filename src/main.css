@@ -111,7 +111,7 @@ select {
 :root {
   --color-text: #191919;
   --color-white: #fff;
-  --color-bg: #ecebe5; /*#ecebe5 */
+  --color-bg: #ffffff; /*#ecebe5 */
   --sans: "DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   --mono: "DM Mono",Courier,Inconsolata,monospace;
   --line-height: 1.4;
