@@ -1,18 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, shrink-to-fit=no, user-scalable=no, minimum-scale=1, maximum-scale=1">
-  <title>01sketch</title>
-  
-  <!-- Link to a fancy Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Festive&family=Press+Start+2P&display=swap" rel="stylesheet">
-  
-  <style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Marcel Andreas Reimer</title>
+
+    <meta name="description" content="cross-medium experimental media artist focusing on sculpture installation, realtime live visuals, VJ/DJ, electronic music and performance art">
+    <link rel="shortcut icon" href="./media/colorgif.gif">
+
+    <meta property="og:site_name" content="Marcel Andreas Reimer">
+    <meta property="og:title" content="Marcel Andreas Reimer">
+    <meta property="og:description" content="cross-medium experimental media artist focusing on sculpture installation, realtime live visuals, VJ/DJ, electronic music and performance art">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en">
+    <meta property="og:url" content="https://marcelandreasreimer.github.io">
+    <meta property="og:image" content="./media/colorgif.gif">
+    <meta property="og:image:width" content="1000">
+    <meta property="og:image:height" content="700">
+
+    <link rel="stylesheet" href="./src/main.css">
+    <link rel="stylesheet" href="./src/custom.css">
+ <style>
     /* General styling for full-screen, flexbox, and layout */
-    html, body {
+    test {
       width: 100%;
-   
       margin: 0;
       display: flex;
       justify-content: center;
@@ -22,29 +37,55 @@
     }
 
     /* Title styling to make it large and fancy */
-    h1 {
-      font-family: 'Press Start 2P', sans-serif; /* Choose your custom font */
-      font-size: 8rem; /* Large size */
-      text-align: center;
-      margin-bottom: 40px;
-      margin-top: 40px;
-      color: #333;
-      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-    }
+
 
     /* Centering and styling for the canvas */
     canvas {
       margin: auto;
       display: block;
       box-shadow: 0 2px 12px -2px rgba(0, 0, 0, .15);
-      margin-bottom: 40px;
+      margin-bottom: 60px;
     }
+
+
+
   </style>
 </head>
-<body>
 
+<body class="defaultTemplate">
+    <a href="https://clean.scrupl.es/about#content" class="skipLink">Skip to content</a>
+    <header role="banner">
+        <div class="wrapper">
+            <nav role="navigation" class="wrapper">
+                <a href="https://marcelandreasreimer.github.io" class="logo" title="Clean.">
+                    marcel andreas reimer
+                </a>
+                <div class="headerNavs">
+                    <ul class="nav">
+                        <li>
+                            <a href="./about.html" class="navCurrent">About</a>
+                        </li>
+                        <li>
+                            <a href="https://marcelandreasreimer.github.io">CV</a>
+                        </li>
+                        <li>
+                            <a href="./gallery.html">Gallery</a>
+                        </li>
+                        <li>
+                            <a href="./toys.html">Toys</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <main class="container" id="content" role="main">
+        <div class="wrapper">
   <!-- Large title with fancy font -->
-  <h1>Toys by Marcellus</h1>
+            <header class="masthead">
+                 <!-- <h1>Toys by Marcellus</h1>-->
+            </header>
+
 
   <!-- Your sketch script -->
     <script src="./src/sketches/06-sketch.js"></script>
@@ -58,8 +99,24 @@
    <script src="./src/sketches/08-sketch.js"></script>
 
 
+            <!--<img src="./media/marcel.jpeg" style="width:100%" alt="marcel andreas reimer, DJ, VJ, live set"/>-->
+        </div>
+    </main>
+    <footer role="contentinfo" class="wrapper">
+        <div class="footerPrimary">
+            <ul class="footerList">
+                <li>© 2024 Marcel Andreas Reimer</a></li><!--&nbsp;&nbsp;·&nbsp;&nbsp;</li>
+                    <li><a href="" rel="noopener">Feed</a></li>-->
+                </ul>
+            </div>
+            <div class="footerSecondary">
+                <ul class="footerList">
+                    <li><a href="https://www.instagram.com/mr_marcellus_wallace" rel="noopener">Instagram</a>&nbsp;&nbsp;·&nbsp;&nbsp;</li>
+                    <li><a href="https://scruples.studio/" rel="noopener">Made with Scruples</a></li>
+                </ul>
+            </div>
+        </footer>
+        <script src="./src/site.js"></script>
+    </body>
 
-
-
-</body>
-</html>
+    </html>
