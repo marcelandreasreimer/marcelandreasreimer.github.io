@@ -456,7 +456,8 @@ body {
 
 .articleList a:hover,
 .articleList a:active {
-  text-decoration: underline;
+  /*text-decoration: underline;*/
+border: 0.5em dotted;
 }
 
 @media only screen and (min-width: 50em) {
