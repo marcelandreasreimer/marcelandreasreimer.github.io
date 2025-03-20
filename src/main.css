@@ -81,7 +81,7 @@ select {
   --color-text: #191919;
   --color-white: #fff;
   --color-bg: #ffffff; /*#ecebe5 */
-  --sans: "Press Start 2P", serif;
+  --sans: "Silkscreen", sans-serif;
   --line-height: 1.4;
   --line-height-s: 1.15;
   --line-height-xs: 1;
@@ -127,6 +127,7 @@ select {
   --layout-space-l: calc(6rem + 3vw);
   --layout-space-m: calc(6rem + 1vw);
   --layout-space: calc(3rem + 2vw);
+
 }
 
 html {
@@ -139,6 +140,7 @@ html {
 
 body {
   line-height: var(--line-height);
+
 }
 
 h1,
@@ -172,6 +174,7 @@ input,
 select,
 textarea {
   font-size: var(--font-size);
+
 }
 
 body,
