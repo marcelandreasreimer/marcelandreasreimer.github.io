@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live VJ Generator (Single File)</title>
+    
+    <style>
+        /* Remove margins/padding to make the canvas truly full-screen */
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #000; /* Ensure the body background is black before canvas loads */
+        }
+        /* Make the canvas a block element to prevent extra space */
+        canvas { 
+            display: block; 
+        }
+        /* Style for the fullscreen button overlay */
+        #fullscreen-btn {
+            position: fixed;
+            top: 10px;
+            right: 180px; /* Position next to the dat.GUI panel */
+            z-index: 1000;
+            padding: 8px 15px;
+            background-color: #555;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: sans-serif;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            transition: background-color 0.2s;
+        }
+        #fullscreen-btn:hover {
+            background-color: #777;
+        }
+    </style>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+</head>
+<body>
+    <button id="fullscreen-btn">Toggle Fullscreen (F)</button>
+
+    <script>
+        // --- Parameters Object for dat.GUI ---
+        const params = {
+            // General controls
+            lines: 400,
+            backgroundLuminance: 10,
+            speedMultiplier: 1.0,
+            trailEffect: true,
+
+            // Line style and color
+            baseLineWidth: 0.5,
+            maxLineWidth: 2.0,
+            redChance: 0.5,
+
+            // HSL Color Tweak
+            redHue: 0,
+            redSaturation: 100,
+            redLuminanceMin: 20,
+            redLuminanceMax: 50,
+
+            // Functions for GUI interaction
+            resetVisual: null, // Will be set up later
+            toggleFullscreen: null, // Will be set up later
+        };
+
+        let lines = [];
+        let myCanvas;
+
+        // Utility function to choose red or black based on the GUI param
+        const bloodOrBlack = () => {
+            // p5.js's random() is used here instead of Math.random for consistency
+            const redL = random(params.redLuminanceMin, params.redLuminanceMax);
+            const redShade = `hsl(${params.redHue}, ${params.redSaturation}%, ${redL}%)`;
+            const blackShade = 'hsl(0, 0%, 0%)';
+            
+            return Math.random() < params.redChance ? redShade : blackShade;
+        };
+
+        // Function to initialize or reset all the lines
+        const initializeLines = () => {
+            lines = Array.from({ length: params.lines }).map(() => ({
+                // Start points across the screen
+                x1: random(width), y1: random(height),
+                x2: random(width), y2: random(height),
+                // Control points for the curve
+                controlX: random(width), controlY: random(height),
+                
+                lineWidth: random(params.baseLineWidth, params.maxLineWidth),
+                strokeColor: bloodOrBlack(),
+
+                // Random movement vectors
+                speedX1: random(-1, 1), speedY1: random(-1, 1),
+                speedX2: random(-1, 1), speedY2: random(-1, 1),
+                speedControlX: random(-1, 1), speedControlY: random(-1, 1),
+            }));
+        };
+        
+        // Link the GUI function to the internal function
+        params.resetVisual = initializeLines;
+
+
+        // --- p5.js Setup Function ---
+        function setup() {
+            // Make the canvas span the full window size
+            myCanvas = createCanvas(windowWidth, windowHeight);
+            
+            // Initialize the lines now that the canvas size is set
+            initializeLines(); 
+            
+            // Set up the dat.GUI panel
+            setupGUI();
+
+            // Attach event listener for the HTML fullscreen button
+            document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+        }
+
+
+        // --- p5.js Draw Function (The Live Loop) ---
+        function draw() {
+            // Background/Trail Effect: Use a semi-transparent background if the trail effect is on
+            const fillAlpha = params.trailEffect ? 0.05 : 1.0;
+            const fillL = params.backgroundLuminance;
+            
+            // Draw the background with opacity for the "trail" effect
+            background(`hsla(0, 0%, ${fillL}%, ${fillAlpha})`);
+            
+            // If no trail is desired, clear the screen completely
+            if (!params.trailEffect) {
+                // Clear the background completely for sharp lines
+                background(`hsl(0, 0%, ${fillL}%)`);
+            }
+
+            // Line rendering loop
+            lines.forEach(line => {
+                const speed = params.speedMultiplier * 0.5;
+                
+                // Update positions using sine/cosine for fluid movement
+                line.x1 += line.speedX1 * speed * (sin(frameCount * 0.01) * 0.5 + 1);
+                line.y1 += line.speedY1 * speed * (cos(frameCount * 0.01) * 0.5 + 1);
+                line.x2 += line.speedX2 * speed * (sin(frameCount * 0.012) * 0.5 + 1);
+                line.y2 += line.speedY2 * speed * (cos(frameCount * 0.012) * 0.5 + 1);
+                line.controlX += line.speedControlX * speed * sin(frameCount * 0.011);
+                line.controlY += line.speedControlY * speed * cos(frameCount * 0.011);
+
+                // Boundary check: Reverse direction when hitting the edges
+                if (line.x1 < 0 || line.x1 > width) line.speedX1 *= -random(0.5, 1);
+                if (line.y1 < 0 || line.y1 > height) line.speedY1 *= -random(0.5, 1);
+                if (line.x2 < 0 || line.x2 > width) line.speedX2 *= -random(0.5, 1);
+                if (line.y2 < 0 || line.y2 > height) line.speedY2 *= -random(0.5, 1);
+                if (line.controlX < 0 || line.controlX > width) line.speedControlX *= -1;
+                if (line.controlY < 0 || line.controlY > height) line.speedControlY *= -1;
+
+                // Draw the curved line
+                noFill();
+                stroke(line.strokeColor);
+                strokeWeight(Math.abs(line.lineWidth));
+
+                beginShape();
+                vertex(line.x1, line.y1);
+                // Use quadraticVertex for the curved line (like your original)
+                quadraticVertex(line.controlX, line.controlY, line.x2, line.y2); 
+                endShape();
+            });
+        }
+
+
+        // --- Dynamic Resizing (Handles Full-Screen and Browser Resize) ---
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+
+
+        // --- Fullscreen Toggle Logic ---
+        function toggleFullscreen() {
+            let fs = fullscreen();
+            fullscreen(!fs);
+        }
+        
+        // Link the GUI function to the internal function
+        params.toggleFullscreen = toggleFullscreen;
+
+        // Keypress 'F' to toggle fullscreen for VJ performance
+        function keyPressed() {
+            if (key === 'f' || key === 'F') {
+                toggleFullscreen();
+            }
+        }
+
+
+        // --- dat.GUI Setup ---
+        function setupGUI() {
+            const gui = new dat.GUI();
+            
+            // General Folder
+            const generalFolder = gui.addFolder('General');
+            generalFolder.add(params, 'lines', 10, 2000).step(10).onChange(initializeLines).name('Line Count');
+            generalFolder.add(params, 'backgroundLuminance', 0, 100).step(1).name('Background L (%)');
+            generalFolder.add(params, 'speedMultiplier', 0, 5).step(0.1).name('Global Speed');
+            generalFolder.add(params, 'trailEffect').name('Trail Effect');
+            generalFolder.open();
+            
+            // Line Style Folder
+            const styleFolder = gui.addFolder('Line Style');
+            styleFolder.add(params, 'baseLineWidth', 0.1, 5).step(0.1).name('Min Line W');
+            styleFolder.add(params, 'maxLineWidth', 1, 10).step(0.5).name('Max Line W');
+            styleFolder.add(params, 'redChance', 0, 1).step(0.01).name('Red Line Chance');
+            styleFolder.open();
+
+            // Color Tweak Folder
+            const colorFolder = gui.addFolder('Blood Color Tweak');
+            colorFolder.add(params, 'redHue', 0, 360).step(1).name('Hue (0=Red)');
+            colorFolder.add(params, 'redSaturation', 0, 100).step(1).name('Saturation (%)');
+            colorFolder.add(params, 'redLuminanceMin', 0, 100).step(1).name('Luminance Min (%)');
+            colorFolder.add(params, 'redLuminanceMax', 0, 100).step(1).name('Luminance Max (%)');
+            colorFolder.open();
+
+            // Action Buttons
+            gui.add(params, 'resetVisual').name('Reset Visual');
+            gui.add(params, 'toggleFullscreen').name('Toggle Fullscreen');
+        }
+    </script>
+</body>
+</html>

@@ -80,7 +80,7 @@ select {
 :root {
   --color-text: #191919;
   --color-white: #fff;
-  --color-bg: #ffffff; /*#ecebe5 */
+  --color-bg: grey; /*#ecebe5 */
   --sans: "Silkscreen", sans-serif;
   --line-height: 1.4;
   --line-height-s: 1.15;
@@ -105,7 +105,7 @@ select {
   --font-size: calc(1.125rem + 0.2vw);
   --font-size-s: calc(0.9rem + 0.2vw);
   --font-size-xs: calc(0.8rem + 0.2vw);
-  --width: 100rem;
+  --width: 75rem;
   --max-width: min(var(--width), calc(100vw - var(--space-4xl)));
   --max-width-content: min(100rem, calc(100vw - var(--space-4xl)));
   --max-width-media: calc(100% - 10vw);
@@ -227,6 +227,7 @@ pre {
 [role=navigation] a {
   text-decoration: none;
   font-weight: var(--medium-weight);
+  font-family: arial;
 }
 
 .nav {
@@ -409,7 +410,7 @@ body {
 }
 
 .articleList li + li {
-  border-top: var(--border-thickness) solid var(--color-text);
+  border-top: var(--border-thickness) dotted var(--color-text);
 }
 
 .articleList-meta {
@@ -476,7 +477,7 @@ body {
 .masthead h1::before {
   content: "";
   display: block;
-  border-top: var(--border-thickness) solid var(--color-text);
+  border-top: var(--border-thickness) dotted var(--color-text);
   margin-top: var(--space-s);
   margin-bottom: var(--space-s);
 }
