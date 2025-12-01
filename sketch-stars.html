@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live VJ Canvas Generator with GUI</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Hide scrollbars */
+            background-color: black;
+        }
+        canvas {
+            display: block; /* Important to remove any default margins/gaps */
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
+</head>
+<body>
+    <canvas id="vjCanvas"></canvas>
+
+    <script>
+        // --- 1. SETUP CANVAS AND CONTEXT ---
+        const canvas = document.getElementById('vjCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        // Function to resize the canvas to fill the window
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // --- 2. GUI PARAMETERS ---
+        const GUI_PARAMS = {
+            numShapes: 50, // Reduced from 5000 for better initial performance
+            maxRadius: 75,
+            minRadius: 25,
+            baseSpeed: 1,
+            fadeAlpha: 0.1, // Controls the trailing effect
+            shapeColor: 'flash', // 'flash' or 'static'
+            staticColor: '#FFFFFF', // White as default static color
+            strokeWeight: 1,
+            oscillationEnabled: true,
+            init: initializeShapes // Function to re-initialize shapes
+        };
+
+        const gui = new dat.GUI();
+        
+        // Setup GUI folders and controls
+        const shapeFolder = gui.addFolder('Shapes');
+        shapeFolder.add(GUI_PARAMS, 'numShapes', 1, 500).step(1).name('Count').onFinishChange(GUI_PARAMS.init);
+        shapeFolder.add(GUI_PARAMS, 'minRadius', 1, 100).name('Min Size');
+        shapeFolder.add(GUI_PARAMS, 'maxRadius', 1, 200).name('Max Size');
+        shapeFolder.open();
+
+        const motionFolder = gui.addFolder('Motion');
+        motionFolder.add(GUI_PARAMS, 'baseSpeed', 0.1, 5).name('Base Speed');
+        motionFolder.add(GUI_PARAMS, 'oscillationEnabled').name('Oscillation');
+        motionFolder.open();
+        
+        const styleFolder = gui.addFolder('Style');
+        styleFolder.add(GUI_PARAMS, 'fadeAlpha', 0.001, 1).step(0.001).name('Fade Trail Alpha');
+        styleFolder.add(GUI_PARAMS, 'shapeColor', ['flash', 'static']).name('Color Mode');
+        styleFolder.addColor(GUI_PARAMS, 'staticColor').name('Static Color');
+        styleFolder.add(GUI_PARAMS, 'strokeWeight', 0, 5).name('Stroke Weight');
+        styleFolder.open();
+
+        gui.add(GUI_PARAMS, 'init').name('Re-Initialize Shapes');
+
+        // --- 3. HELPER FUNCTIONS (REPLACING canvas-sketch-util/random) ---
+        
+        // Random range utility
+        const randomRange = (min, max) => Math.random() * (max - min) + min;
+
+        // Function to generate random colors (used in 'flash' mode)
+        const randomColor = () => {
+            // Bright colors: random hue (0-360), 100% saturation, 50% lightness
+            return `hsl(${Math.random() * 360}, 100%, 50%)`;
+        };
+
+        // --- 4. SHAPE DATA STRUCTURE AND INITIALIZATION ---
+        let shapes = [];
+
+        function createShape(i) {
+            const initialRadius = randomRange(GUI_PARAMS.minRadius, GUI_PARAMS.maxRadius);
+            return {
+                // Initial position
+                x: Math.random() * width,
+                y: Math.random() * height,
+                // Size and transition
+                radius: initialRadius,
+                targetRadius: randomRange(GUI_PARAMS.minRadius, GUI_PARAMS.maxRadius),
+                numPoints: Math.floor(randomRange(3, 90)), // 3 to 90 points
+                // Movement
+                speed: randomRange(0.5, 5) * GUI_PARAMS.baseSpeed,
+                angle: Math.random() * Math.PI * 2, // 0 to 2*PI radians
+                // Oscillation
+                oscillationSpeed: randomRange(0.01, 0.05),
+                oscillationDirection: Math.random() > 0.5 ? 1 : -1,
+                // Individual color for 'flash' mode
+                flashColor: randomColor()
+            };
+        }
+
+        function initializeShapes() {
+            // Clear existing shapes and create a new array based on numShapes
+            shapes = Array.from({ length: GUI_PARAMS.numShapes }, (v, i) => createShape(i));
+        }
+
+        initializeShapes(); // Initial population of shapes
+
+        // --- 5. DRAWING LOGIC ---
+
+        // Function to draw an organic shape
+        const drawShape = (context, x, y, radius, numPoints, shapeColor, strokeWeight) => {
+            context.beginPath();
+            
+            // Start with a point to the right of the center
+            context.moveTo(x + radius, y); 
+
+            for (let i = 0; i <= numPoints; i++) {
+                const angle = (Math.PI * 2 / numPoints) * i;
+                // Offset calculation (using a static multiplier for simplicity)
+                const offset = randomRange(-radius * 0.3, radius * 0.3); 
+                const pointX = x + Math.cos(angle) * (radius + offset);
+                const pointY = y + Math.sin(angle) * (radius + offset);
+                context.lineTo(pointX, pointY);
+            }
+
+            context.closePath();
+            
+            // Fill
+            context.fillStyle = shapeColor;
+            context.fill();
+
+            // Stroke
+            if (strokeWeight > 0) {
+                context.strokeStyle = 'black';
+                context.lineWidth = strokeWeight;
+                context.stroke();
+            }
+        };
+
+        // Main animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 1. Background Fade Effect (Ghosting/Trail)
+            // Draw a semi-transparent black rectangle over the whole canvas
+            ctx.fillStyle = `rgba(0, 0, 0, ${GUI_PARAMS.fadeAlpha})`;
+            ctx.fillRect(0, 0, width, height);
+
+            // 2. Update and Draw Shapes
+            shapes.forEach(shape => {
+                
+                // --- UPDATE LOGIC ---
+                
+                // Position Update: Movement
+                shape.x += Math.cos(shape.angle) * shape.speed;
+                shape.y += Math.sin(shape.angle) * shape.speed;
+
+                // Speed Oscillation (Controlled by GUI_PARAMS.oscillationEnabled)
+                if (GUI_PARAMS.oscillationEnabled) {
+                    shape.speed += shape.oscillationDirection * shape.oscillationSpeed;
+                    const maxSpeed = 5 * GUI_PARAMS.baseSpeed;
+                    const minSpeed = 0.5 * GUI_PARAMS.baseSpeed;
+                    if (shape.speed > maxSpeed) shape.oscillationDirection = -1;
+                    if (shape.speed < minSpeed) shape.oscillationDirection = 1;
+                } else {
+                    // If disabled, keep speed stable (re-apply base speed factor)
+                    shape.speed = Math.min(shape.speed, 5 * GUI_PARAMS.baseSpeed);
+                }
+
+                // Boundary Check: Reverse direction when hitting edges
+                const pad = shape.radius * 0.5; // Padding to prevent shapes from fully exiting
+                if (shape.x < pad || shape.x > width - pad) {
+                    shape.angle = Math.PI - shape.angle; // Reverse X direction
+                }
+                if (shape.y < pad || shape.y > height - pad) {
+                    shape.angle = -shape.angle; // Reverse Y direction
+                }
+                
+                // Size Transition: Smooth change towards target radius
+                const radiusChange = (shape.targetRadius - shape.radius) * 0.1;
+                shape.radius += radiusChange;
+
+                // Update Target Radius: Set a new target when close to the current one
+                if (Math.abs(shape.radius - shape.targetRadius) < 1) {
+                    shape.targetRadius = randomRange(GUI_PARAMS.minRadius, GUI_PARAMS.maxRadius);
+                }
+
+                // Color Selection
+                const color = GUI_PARAMS.shapeColor === 'flash' ? shape.flashColor : GUI_PARAMS.staticColor;
+
+                // --- DRAW LOGIC ---
+                drawShape(
+                    ctx, 
+                    shape.x, 
+                    shape.y, 
+                    shape.radius, 
+                    shape.numPoints, 
+                    color,
+                    GUI_PARAMS.strokeWeight
+                );
+            });
+        }
+
+        // Start the animation
+        animate();
+
+    </script>
+</body>
+</html>

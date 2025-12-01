@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Morphing Grid VJ Generator</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
+</head>
+<body>
+    <canvas id="vjCanvas"></canvas>
+
+    <script>
+        // --- PERLIN NOISE IMPLEMENTATION (Embedded for stability) ---
+        // Based on Perlin's Improved Noise (2002)
+        const Perlin = (function() {
+            const P = new Array(512);
+            const permutation = [
+                151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10,
+                23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87, 174,
+                20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166, 77, 205, 181, 112, 109, 66, 146, 189, 218, 100, 44, 25, 128,
+                144, 157, 115, 14, 185, 176, 161, 119, 210, 245, 127, 4, 150, 255, 107, 241, 254, 173, 202, 196, 180, 187, 98, 108, 110, 79, 113,
+                224, 232, 178, 188, 204, 195, 38, 123, 167, 251, 124, 206, 49, 118, 143, 84, 58, 154, 193, 2, 72, 2, 106, 1, 192, 125, 193, 148,
+                116, 24, 50, 179, 113, 85, 162, 130, 208, 236, 215, 170, 46, 239, 34, 12, 19, 145, 209, 132, 60, 121, 16, 135, 138, 63, 105, 83,
+                238, 207, 191, 122, 17, 226, 158, 249, 41, 141, 250, 199, 25, 129, 242, 244, 93, 184, 126, 18, 133, 169, 39, 186, 213, 235, 101,
+                253, 152, 89, 43, 198, 70, 102, 78, 231, 13, 250, 21, 13, 240, 240, 229, 13, 240, 240
+            ];
+            for (let i = 0; i < 256; i++) {
+                P[i] = P[i + 256] = permutation[i];
+            }
+
+            function fade(t) {
+                return t * t * t * (t * (t * 6 - 15) + 10);
+            }
+
+            function lerp(t, a, b) {
+                return a + t * (b - a);
+            }
+
+            function grad(hash, x, y, z) {
+                const h = hash & 15;
+                const u = h < 8 ? x : y;
+                const v = h < 4 ? y : h === 12 || h === 14 ? x : z;
+                return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+            }
+
+            return {
+                get: function(x, y, z) {
+                    let X = Math.floor(x) & 255;
+                    let Y = Math.floor(y) & 255;
+                    let Z = Math.floor(z) & 255;
+                    
+                    x -= Math.floor(x);
+                    y -= Math.floor(y);
+                    z -= Math.floor(z);
+                    
+                    let u = fade(x);
+                    let v = fade(y);
+                    let w = fade(z);
+                    
+                    let A = P[X] + Y;
+                    let AA = P[A] + Z;
+                    let AB = P[A + 1] + Z;
+                    let B = P[X + 1] + Y;
+                    let BA = P[B] + Z;
+                    let BB = P[B + 1] + Z;
+                    
+                    return lerp(w, lerp(v, lerp(u, grad(P[AA], x, y, z),
+                        grad(P[BA], x - 1, y, z)),
+                        lerp(u, grad(P[AB], x, y - 1, z),
+                            grad(P[BB], x - 1, y - 1, z))),
+                        lerp(v, lerp(u, grad(P[AA + 1], x, y, z - 1),
+                            grad(P[BA + 1], x - 1, y, z - 1)),
+                            lerp(u, grad(P[AB + 1], x, y - 1, z - 1),
+                                grad(P[BB + 1], x - 1, y - 1, z - 1))));
+                }
+            };
+        })();
+
+        // --- 1. SETUP CANVAS AND CONTEXT ---
+        const canvas = document.getElementById('vjCanvas');
+        const ctx = canvas.getContext('2d');
+        const noise = Perlin; 
+        let width, height;
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        // Function to resize the canvas to fill the window
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            
+            mouseX = width / 2;
+            mouseY = height / 2;
+        }
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            generateGeometries();
+        });
+        
+        window.addEventListener('mousemove', (event) => {
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        });
+
+        // --- 2. GUI PARAMETERS (Neon Color Selection) ---
+        const NEON_COLORS = {
+            'Neon Blue': '#0000FF',
+            'Laser Red': '#FF0055',
+            'Electric Green': '#00FF00',
+            'Fuchsia': '#FF00FF',
+            'Cyber Yellow': '#FFFF00'
+        };
+
+        const GUI_PARAMS = {
+            gridSize: 10,
+            maxRadius: 100,
+            lineWidth: 3,
+            morphSpeed: 0.1,
+            noiseScale: 0.005,
+            noiseStrength: 150,
+            fadeAmount: 0.9,
+            // Changed from hex input to key string from NEON_COLORS
+            strokeColorName: 'Neon Blue', 
+            drawMode: 'Stroke Only',
+            init: generateGeometries 
+        };
+
+        // --- 3. HELPER FUNCTIONS ---
+        const randomRange = (min, max) => Math.random() * (max - min) + min;
+        const lerp = (a, b, t) => a * (1 - t) + b * t;
+        const randomPick = (array) => array[Math.floor(Math.random() * array.length)];
+        
+        // --- 4. GEOMETRY DATA STRUCTURE AND INITIALIZATION ---
+        let geometries = [];
+
+        function generateGeometries() {
+            geometries = [];
+            
+            const spacingX = width / GUI_PARAMS.gridSize;
+            const spacingY = height / GUI_PARAMS.gridSize;
+
+            for (let i = 0; i < GUI_PARAMS.gridSize; i++) {
+                for (let j = 0; j < GUI_PARAMS.gridSize; j++) {
+                    const x = (i + 0.5) * spacingX;
+                    const y = (j + 0.5) * spacingY;
+                    
+                    geometries.push({
+                        baseX: x,
+                        baseY: y,
+                        radius: randomRange(20, GUI_PARAMS.maxRadius),
+                        type: randomPick(['circle', 'triangle', 'hexagon']),
+                        
+                        noiseOffset: randomRange(0, 1000), 
+                        currentX: x, 
+                        currentY: y,
+                    });
+                }
+            }
+        }
+
+        // --- 5. DRAWING FUNCTIONS ---
+        const drawCircle = (context, x, y, radius) => {
+            context.beginPath();
+            context.arc(x, y, radius, 0, Math.PI * 2);
+            context.closePath();
+            context.stroke();
+        };
+
+        const drawPolygon = (context, x, y, size, numSides) => {
+            const angleStep = Math.PI * 2 / numSides;
+            context.beginPath();
+            for (let i = 0; i <= numSides; i++) {
+                const angle = i * angleStep;
+                const xOffset = Math.cos(angle) * size;
+                const yOffset = Math.sin(angle) * size;
+                if (i === 0) {
+                    context.moveTo(x + xOffset, y + yOffset);
+                } else {
+                    context.lineTo(x + xOffset, y + yOffset);
+                }
+            }
+            context.closePath();
+            context.stroke();
+        };
+
+        // --- 6. INTERPOLATION AND UPDATE LOGIC ---
+
+        const interpolateShape = (context, geometry, mouseX, mouseY) => {
+            const { baseX, baseY, radius, type, noiseOffset } = geometry;
+
+            // 1. Perlin Noise Calculation
+            const time = performance.now() * 0.001; 
+            const noiseScale = GUI_PARAMS.noiseScale;
+
+            const noiseValX = noise.get(baseX * noiseScale, baseY * noiseScale, time * GUI_PARAMS.morphSpeed);
+            const noiseValY = noise.get(baseY * noiseScale, baseX * noiseScale, time * GUI_PARAMS.morphSpeed + noiseOffset);
+
+            const displacementX = noiseValX * GUI_PARAMS.noiseStrength;
+            const displacementY = noiseValY * GUI_PARAMS.noiseStrength;
+
+            // 2. Target Position (Base + Perlin Noise Displacement)
+            const targetX = baseX + displacementX;
+            const targetY = baseY + displacementY;
+
+            // 3. Smooth Position Update (Lerp)
+            const smoothing = 0.15;
+            geometry.currentX = lerp(geometry.currentX, targetX, smoothing);
+            geometry.currentY = lerp(geometry.currentY, targetY, smoothing);
+
+            // 4. Mouse influence
+            const mouseInfluence = 0.001;
+            geometry.currentX = lerp(geometry.currentX, mouseX, mouseInfluence);
+            geometry.currentY = lerp(geometry.currentY, mouseY, mouseInfluence);
+
+            // 5. Radius Variation
+            const radiusNoise = noise.get(time * GUI_PARAMS.morphSpeed * 0.5, geometry.noiseOffset, time);
+            const variation = radiusNoise * (GUI_PARAMS.maxRadius * 0.4);
+            const adjustedRadius = Math.max(10, geometry.radius + variation);
+            
+            // 6. Draw the shape
+            if (type === 'circle') {
+                drawCircle(context, geometry.currentX, geometry.currentY, adjustedRadius);
+            } else if (type === 'triangle') {
+                drawPolygon(context, geometry.currentX, geometry.currentY, adjustedRadius, 3);
+            } else if (type === 'hexagon') {
+                drawPolygon(context, geometry.currentX, geometry.currentY, adjustedRadius, 6);
+            }
+        };
+
+
+        // --- 7. MAIN ANIMATION LOOP ---
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Get the hex code from the chosen name
+            const currentStrokeColor = NEON_COLORS[GUI_PARAMS.strokeColorName];
+
+            // 1. Background Clear/Fade Effect
+            const alpha = 1 - GUI_PARAMS.fadeAmount;
+            ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+            ctx.fillRect(0, 0, width, height);
+            
+            // Set drawing styles
+            ctx.lineWidth = GUI_PARAMS.lineWidth;
+            ctx.strokeStyle = currentStrokeColor;
+            
+            if (GUI_PARAMS.drawMode === 'Fill and Stroke') {
+                ctx.fillStyle = currentStrokeColor + '80'; // Use the neon color with transparency
+            }
+
+            // 2. Update and Draw Geometries
+            geometries.forEach(geometry => {
+                interpolateShape(ctx, geometry, mouseX, mouseY);
+                
+                if (GUI_PARAMS.drawMode === 'Fill and Stroke') {
+                    ctx.fill();
+                }
+            });
+        }
+
+        // --- 8. GUI SETUP ---
+        const gui = new dat.GUI();
+        
+        // Style Folder
+        const styleFolder = gui.addFolder('Style');
+        
+        // NEW: Dropdown for Neon Colors
+        styleFolder.add(GUI_PARAMS, 'strokeColorName', Object.keys(NEON_COLORS)).name('Neon Color');
+        
+        styleFolder.add(GUI_PARAMS, 'fadeAmount', 0.8, 1.0).step(0.001).name('Fade Trail (1=None)');
+        styleFolder.add(GUI_PARAMS, 'lineWidth', 1, 15).name('Stroke Weight');
+        styleFolder.add(GUI_PARAMS, 'drawMode', ['Stroke Only', 'Fill and Stroke']).name('Draw Mode');
+        styleFolder.open();
+
+        // Grid/Motion Folder
+        const motionFolder = gui.addFolder('Grid & Motion');
+        motionFolder.add(GUI_PARAMS, 'gridSize', 4, 20).step(1).name('Grid Size (N)').onFinishChange(GUI_PARAMS.init);
+        motionFolder.add(GUI_PARAMS, 'maxRadius', 50, 200).name('Max Radius');
+        motionFolder.add(GUI_PARAMS, 'morphSpeed', 0.01, 0.5).step(0.01).name('Morph Speed');
+        motionFolder.add(GUI_PARAMS, 'noiseScale', 0.001, 0.01).step(0.0001).name('Noise Scale (Zoom)');
+        motionFolder.add(GUI_PARAMS, 'noiseStrength', 50, 400).name('Noise Strength (Move)');
+        motionFolder.open();
+
+        gui.add(GUI_PARAMS, 'init').name('Re-Initialize Grid');
+        
+        // --- 9. START ---
+        resizeCanvas();
+        generateGeometries();
+        animate(); 
+    </script>
+</body>
+</html>
