@@ -16,7 +16,7 @@
         canvas { 
             display: block; 
         }
-        /* Style for the fullscreen butto n overlay */
+        /* Style for the fullscreen button overlay */
         #fullscreen-btn {
             position: fixed;
             top: 10px;
@@ -78,11 +78,13 @@
             const redShade = `hsl(${params.redHue}, ${params.redSaturation}%, ${redL}%)`;
             const blackShade = 'hsl(0, 0%, 0%)';
             
+            // Uses the current params.redChance
             return Math.random() < params.redChance ? redShade : blackShade;
         };
 
         // Function to initialize or reset all the lines
         const initializeLines = () => {
+            // Re-generates all lines using the current parameters
             lines = Array.from({ length: params.lines }).map(() => ({
                 // Start points across the screen
                 x1: random(width), y1: random(height),
@@ -90,6 +92,7 @@
                 // Control points for the curve
                 controlX: random(width), controlY: random(height),
                 
+                // Uses the current params.baseLineWidth and params.maxLineWidth
                 lineWidth: random(params.baseLineWidth, params.maxLineWidth),
                 strokeColor: bloodOrBlack(),
 
@@ -198,6 +201,7 @@
             
             // General Folder
             const generalFolder = gui.addFolder('General');
+            // This needs initializeLines() to spawn the correct number of lines
             generalFolder.add(params, 'lines', 10, 2000).step(10).onChange(initializeLines).name('Line Count');
             generalFolder.add(params, 'backgroundLuminance', 0, 100).step(1).name('Background L (%)');
             generalFolder.add(params, 'speedMultiplier', 0, 5).step(0.1).name('Global Speed');
@@ -206,17 +210,19 @@
             
             // Line Style Folder
             const styleFolder = gui.addFolder('Line Style');
-            styleFolder.add(params, 'baseLineWidth', 0.1, 5).step(0.1).name('Min Line W');
-            styleFolder.add(params, 'maxLineWidth', 1, 10).step(0.5).name('Max Line W');
-            styleFolder.add(params, 'redChance', 0, 1).step(0.01).name('Red Line Chance');
+            // 👇 FIX: Added .onChange(initializeLines) to re-read line style parameters
+            styleFolder.add(params, 'baseLineWidth', 0.1, 5).step(0.1).onChange(initializeLines).name('Min Line W');
+            styleFolder.add(params, 'maxLineWidth', 1, 10).step(0.5).onChange(initializeLines).name('Max Line W');
+            styleFolder.add(params, 'redChance', 0, 1).step(0.01).onChange(initializeLines).name('Red Line Chance');
             styleFolder.open();
 
             // Color Tweak Folder
             const colorFolder = gui.addFolder('Blood Color Tweak');
-            colorFolder.add(params, 'redHue', 0, 360).step(1).name('Hue (0=Red)');
-            colorFolder.add(params, 'redSaturation', 0, 100).step(1).name('Saturation (%)');
-            colorFolder.add(params, 'redLuminanceMin', 0, 100).step(1).name('Luminance Min (%)');
-            colorFolder.add(params, 'redLuminanceMax', 0, 100).step(1).name('Luminance Max (%)');
+            // Color tweaks affect strokeColor, so they also need to re-initialize to apply
+            colorFolder.add(params, 'redHue', 0, 360).step(1).onChange(initializeLines).name('Hue (0=Red)');
+            colorFolder.add(params, 'redSaturation', 0, 100).step(1).onChange(initializeLines).name('Saturation (%)');
+            colorFolder.add(params, 'redLuminanceMin', 0, 100).step(1).onChange(initializeLines).name('Luminance Min (%)');
+            colorFolder.add(params, 'redLuminanceMax', 0, 100).step(1).onChange(initializeLines).name('Luminance Max (%)');
             colorFolder.open();
 
             // Action Buttons
