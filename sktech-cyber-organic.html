@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURO-TRIBAL ARCHITECT</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #020202; }
+        canvas { display: block; }
+        #fullscreen-btn {
+            position: fixed; top: 10px; right: 260px; z-index: 1000;
+            padding: 8px 15px; background: #111; color: #555;
+            border: 1px solid #333; cursor: pointer; font-family: monospace;
+            transition: 0.3s;
+        }
+        #fullscreen-btn:hover { border-color: #00ffcc; color: #00ffcc; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+</head>
+<body>
+    <button id="fullscreen-btn">FS (F)</button>
+
+    <script>
+        let branches = [];
+        
+        const params = {
+            // Anatomy
+            branchCount: 60,
+            segments: 20,
+            boneTaper: 0.8,
+            jointSize: 6,
+            
+            // Physics / Growth
+            speed: 0.003,
+            wiggle: 0.6,
+            growthRadius: 150,
+            chaosScale: 0.2,
+            
+            // Neural Glow
+            glowHue: 170,
+            glowSaturation: 100,
+            glowPulse: 5.0,
+            glowChance: 0.3,
+            
+            // Environment
+            bgLuminance: 2,
+            trailStrength: 0.15,
+            rotationSpeed: 0.2,
+            
+            // Actions
+            reboot: () => initializeBranches()
+        };
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            colorMode(HSL);
+            initializeBranches();
+            setupGUI();
+            
+            document.getElementById('fullscreen-btn').addEventListener('click', () => {
+                fullscreen(!fullscreen());
+            });
+        }
+
+        function initializeBranches() {
+            branches = [];
+            for (let i = 0; i < params.branchCount; i++) {
+                branches.push({
+                    id: i,
+                    seed: random(1000),
+                    isCyber: random() < params.glowChance,
+                    vibe: random() // Individual variation
+                });
+            }
+        }
+
+        function draw() {
+            background(0, 0, params.bgLuminance, params.trailStrength);
+            let time = frameCount * params.speed;
+
+            push();
+            translate(width / 2, height / 2);
+            rotate(time * params.rotationSpeed);
+
+            branches.forEach(b => {
+                let angle = (b.id / params.branchCount) * TWO_PI;
+                let radius = params.growthRadius + (noise(b.seed, time) * 50);
+                
+                let curX = cos(angle) * radius;
+                let curY = sin(angle) * radius;
+                let curAngle = angle;
+
+                for (let i = 0; i < params.segments; i++) {
+                    let step = i / params.segments;
+                    let n = noise(b.seed, i * params.chaosScale, time);
+                    curAngle += (n - 0.5) * params.wiggle;
+                    
+                    let segLen = 20 * (1 - step * params.boneTaper) + 5;
+                    let nextX = curX + cos(curAngle) * segLen;
+                    let nextY = curY + sin(curAngle) * segLen;
+
+                    // METALLIC BONE
+                    strokeWeight(map(i, 0, params.segments, 10 * params.boneTaper, 0.5));
+                    stroke(0, 0, 25, 0.7); 
+                    line(curX, curY, nextX, nextY);
+
+                    // JOINTS
+                    if (i % 3 === 0) {
+                        fill(0, 0, 40, 0.5);
+                        noStroke();
+                        ellipse(curX, curY, params.jointSize * (1 - step));
+                    }
+
+                    // NEURAL CIRCUITRY
+                    if (b.isCyber || i % 4 === 0) {
+                        let pulse = (sin(time * params.glowPulse + b.seed) + 1) / 2;
+                        strokeWeight(1);
+                        stroke(params.glowHue, params.glowSaturation, 50 + (pulse * 30), pulse);
+                        line(curX + 1, curY + 1, nextX + 1, nextY + 1);
+                    }
+
+                    curX = nextX;
+                    curY = nextY;
+                }
+            });
+            pop();
+        }
+
+        function setupGUI() {
+            const gui = new dat.GUI();
+            
+            const anatomy = gui.addFolder('Anatomy (Metallic Bone)');
+            anatomy.add(params, 'branchCount', 10, 200).step(1).onChange(params.reboot);
+            anatomy.add(params, 'segments', 5, 50).step(1);
+            anatomy.add(params, 'boneTaper', 0, 1);
+            anatomy.add(params, 'jointSize', 0, 20);
+            anatomy.open();
+
+            const physics = gui.addFolder('Neural Evolution');
+            physics.add(params, 'speed', 0, 0.02);
+            physics.add(params, 'wiggle', 0, 2);
+            physics.add(params, 'chaosScale', 0.01, 0.5).name('Fractal Noise');
+            physics.add(params, 'growthRadius', 10, 400);
+            physics.open();
+
+            const visuals = gui.addFolder('Visual Intensity');
+            visuals.add(params, 'glowHue', 0, 360).name('Cyber Hue');
+            visuals.add(params, 'glowPulse', 0, 20);
+            visuals.add(params, 'glowChance', 0, 1).onChange(params.reboot);
+            visuals.add(params, 'trailStrength', 0.01, 1);
+            visuals.add(params, 'rotationSpeed', -2, 2);
+            visuals.open();
+
+            gui.add(params, 'reboot').name('REGENERATE BONES');
+        }
+
+        function windowResized() { resizeCanvas(windowWidth, windowHeight); }
+        function keyPressed() { if (key === 'f' || key === 'F') fullscreen(!fullscreen()); }
+    </script>
+</body>
+</html>
