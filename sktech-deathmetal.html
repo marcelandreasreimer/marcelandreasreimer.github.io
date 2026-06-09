@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER-SIGIL SCULPTOR</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; }
+        canvas { display: block; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+</head>
+<body>
+    <script>
+        let sigils = [];
+        let gui;
+
+        const params = {
+            complexity: 12,       // How many main "ribs"
+            segments: 20,         // How long each spike is
+            thickness: 18,        // Width of the bone
+            sharpness: 1.8,       // Tapering to needle points
+            chaos: 0.7,           // How much they twist
+            
+            // 3D Bone Effect
+            boneColor: 95,        // 100 is pure white
+            shadowDepth: 4,       // The 3D "bevel" look
+            
+            // Automation
+            autoEvolve: true,
+            evolutionSpeed: 0.3,
+            
+            reboot: () => initSigils()
+        };
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            colorMode(HSL);
+            initSigils();
+            setupGUI();
+        }
+
+        function initSigils() {
+            sigils = [];
+            for (let i = 0; i < params.complexity; i++) {
+                sigils.push({
+                    seed: random(1000),
+                    angleOffset: random(TWO_PI),
+                    yOffset: random(-100, 100)
+                });
+            }
+        }
+
+        function draw() {
+            if (params.autoEvolve) {
+                let t = frameCount * 0.01 * params.evolutionSpeed;
+                params.chaos = map(noise(t), 0, 1, 0.2, 1.5);
+                params.thickness = map(noise(t + 50), 0, 1, 10, 30);
+                for (let i in gui.__controllers) gui.__controllers[i].updateDisplay();
+            }
+
+            background(0); // Deep black
+            let time = frameCount * 0.005;
+
+            push();
+            translate(width / 2, height / 2);
+
+            // Draw Left and Right Mirror
+            for (let m = 0; m < 2; m++) {
+                push();
+                if (m === 1) scale(-1, 1); // Mirroring logic
+                
+                sigils.forEach((s, idx) => {
+                    drawBone(s, time, idx);
+                });
+                pop();
+            }
+            pop();
+        }
+
+        function drawBone(s, time, idx) {
+            let x = 0;
+            let y = s.yOffset;
+            let angle = -HALF_PI + (idx * 0.1);
+
+            let points = [];
+            for (let i = 0; i < params.segments; i++) {
+                let n = noise(s.seed, i * 0.1, time);
+                angle += (n - 0.5) * params.chaos;
+                
+                let len = 15;
+                let nx = x + cos(angle) * len;
+                let ny = y + sin(angle) * len;
+                points.push({x1: x, y1: y, x2: nx, y2: ny, i: i});
+                x = nx; y = ny;
+            }
+
+            // --- THE 3D SCULPTING PASS ---
+            
+            // 1. Draw the Shadow (The "Depth")
+            noFill();
+            strokeCap(ROUND);
+            points.forEach(p => {
+                let step = p.i / params.segments;
+                let w = params.thickness * Math.pow(1 - step, params.sharpness);
+                
+                strokeWeight(w);
+                stroke(0, 0, 10, 0.5); // Very dark shadow
+                line(p.x1 + params.shadowDepth, p.y1 + params.shadowDepth, p.x2 + params.shadowDepth, p.y2 + params.shadowDepth);
+            });
+
+            // 2. Draw the Main Bone Surface
+            points.forEach(p => {
+                let step = p.i / params.segments;
+                let w = params.thickness * Math.pow(1 - step, params.sharpness);
+                
+                strokeWeight(w);
+                stroke(0, 0, params.boneColor); 
+                line(p.x1, p.y1, p.x2, p.y2);
+                
+                // 3. Highlight Pass (The "Bevel" edge)
+                strokeWeight(w * 0.3);
+                stroke(0, 0, 100); // Brightest white
+                line(p.x1 - 1, p.y1 - 1, p.x2 - 1, p.y2 - 1);
+            });
+        }
+
+        function setupGUI() {
+            gui = new dat.GUI();
+            gui.add(params, 'autoEvolve').name('Live Evolution');
+            gui.add(params, 'complexity', 5, 40).step(1).onChange(initSigils);
+            gui.add(params, 'segments', 5, 50).step(1);
+            gui.add(params, 'thickness', 5, 60);
+            gui.add(params, 'sharpness', 0.5, 3.0).name('Point Sharpness');
+            gui.add(params, 'chaos', 0, 2.0);
+            gui.add(params, 'shadowDepth', 0, 15).name('3D Bevel Depth');
+            gui.add(params, 'reboot').name('Regenerate Form');
+        }
+
+        function windowResized() { resizeCanvas(windowWidth, windowHeight); }
+    </script>
+</body>
+</html>
